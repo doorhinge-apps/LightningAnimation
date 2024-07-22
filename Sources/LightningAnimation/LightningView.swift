@@ -12,6 +12,8 @@ import SwiftUI
 
 
 public struct LightningBolt: View {
+    @State var lightningInterval: Double
+    
     @State private var trigger: CGFloat = 0
     @State private var time: CGFloat = 0
     let timer = Timer.publish(every: 0.005, on: .main, in: .common).autoconnect()
@@ -25,7 +27,9 @@ public struct LightningBolt: View {
     
     @State var lightningOpacity = false
     
-    public init() {}
+    public init(lightningInterval: Double) {
+        self._lightningInterval = State(initialValue: lightningInterval)
+    }
     
     public var body: some View {
         ZStack {
@@ -83,7 +87,7 @@ public struct LightningBolt: View {
                                 lightningOpacity = false
                             }
                             
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + lightningInterval) {
                                 pauseAnimating = false
                             }
                         } else {
