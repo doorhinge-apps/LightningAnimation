@@ -15,6 +15,8 @@ public struct Rain: View {
     
     let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
+    public init() {}
+    
     public var body: some View {
         GeometryReader { proxy in
             ZStack {

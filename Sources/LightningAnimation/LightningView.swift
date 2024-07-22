@@ -1,5 +1,5 @@
 //
-// 
+//
 // SwiftUIView.swift
 //
 // Created by Reyna Myers on 22/7/24
@@ -24,7 +24,9 @@ public struct LightningBolt: View {
     @State var brighterLightning = false
     
     @State var lightningOpacity = false
-
+    
+    public init() {}
+    
     public var body: some View {
         ZStack {
             ForEach(branches.indices, id: \.self) { index in
@@ -49,46 +51,46 @@ public struct LightningBolt: View {
                 .shadow(color: Color.blue, radius: brighterLightning ? 10: 0, x: 0, y: 0)
                 .opacity(lightningOpacity ? 0.0: 1.0)
             
-            .onReceive(timer) { _ in
-                if !pauseAnimating {
-                    self.time += 0.02
-                    
-                    if self.time >= 1 {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
-                            withAnimation(.bouncy(duration: 0.2, extraBounce: 0.0)) {
-                                brighterLightning = true
-                            }
-                        }
+                .onReceive(timer) { _ in
+                    if !pauseAnimating {
+                        self.time += 0.02
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation(.linear(duration: 0.2)) {
-                                lightningOpacity = true
+                        if self.time >= 1 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
+                                withAnimation(.bouncy(duration: 0.2, extraBounce: 0.0)) {
+                                    brighterLightning = true
+                                }
                             }
-                        }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                            pauseAnimating = true
-                            self.time = 0
-                            self.trigger += 1
                             
-                            mainPath = Path { path in
-                                path.move(to: CGPoint(x: UIScreen.main.bounds.midX, y: 0))
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.linear(duration: 0.2)) {
+                                    lightningOpacity = true
+                                }
                             }
-                            branches = []
-                            branchPoints = []
                             
-                            brighterLightning = false
-                            lightningOpacity = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                pauseAnimating = true
+                                self.time = 0
+                                self.trigger += 1
+                                
+                                mainPath = Path { path in
+                                    path.move(to: CGPoint(x: UIScreen.main.bounds.midX, y: 0))
+                                }
+                                branches = []
+                                branchPoints = []
+                                
+                                brighterLightning = false
+                                lightningOpacity = false
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                                pauseAnimating = false
+                            }
+                        } else {
+                            self.updatePath()
                         }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                            pauseAnimating = false
-                        }
-                    } else {
-                        self.updatePath()
                     }
                 }
-            }
         }
     }
     
@@ -101,12 +103,12 @@ public struct LightningBolt: View {
         let newX = lastPoint.x + CGFloat.random(in: -xRange...xRange)
         let newY = min(lastPoint.y + yIncrement, rect.height)
         let newPoint = CGPoint(x: newX, y: newY)
-
+        
         mainPath.addLine(to: newPoint)  // Update the main lightning path
         
         // Add to list of potential branching points
         branchPoints.append(newPoint)
-
+        
         // Occasionally add a branch from a random point with reduced frequency
         if Bool.random(probability: 0.1) && branchPoints.count > 2 && newY < rect.height * 0.85 {
             let branchOriginIndex = Int.random(in: 0..<branchPoints.count)
